@@ -23,9 +23,10 @@ categories, enabled the hackathon toggle), and submitted. The app showed a
 consistent with what the flow promised ("one signature repoints its on-chain
 metadata, no funds transferred").
 
-Hours later, `https://aigora.org/services/9232` still shows "agent not found",
-and "My Agents" still shows the "Migrate to Aigora" button on that listing
-instead of reflecting the migrated state.
+The `setAgentURI` transaction confirmed at `2026-07-22T14:54:54Z`. As of
+`2026-07-22T22:18:43Z` (~7.5 hours later), `https://aigora.org/services/9232`
+still shows "agent not found", and "My Agents" still shows the "Migrate to
+Aigora" button on that listing instead of reflecting the migrated state.
 
 I verified independently that this isn't a chain or pinning problem:
 - The wallet's `setAgentURI` transaction to the Identity Registry
@@ -37,9 +38,11 @@ I verified independently that this isn't a chain or pinning problem:
   description, services, OASF skills/domains, categories, external links,
   `onAigora: true`).
 
-So the on-chain state and the pinned metadata are both correct and
-publicly retrievable — the "agent not found" / stale "My Agents" state
-appears to be Aigora's own indexer not picking up the update.
+So the on-chain state and the pinned metadata are both correct and publicly
+retrievable. I can't see Aigora's backend, so I can't confirm the root cause —
+but this rules out a chain or IPFS-pinning problem, leaving something in
+Aigora's own read path (indexer, cache, or query layer) as the most likely
+explanation for why the UI hasn't picked up the update.
 
 ### Steps to reproduce
 1. Have an ERC-8004 agent already registered directly on-chain (not
@@ -53,12 +56,19 @@ appears to be Aigora's own indexer not picking up the update.
    state; it still offers "Migrate to Aigora" as if nothing happened.
 
 ### Logs / console output
-_No response_
+No browser console/network capture from the original session. I tried to
+find a public REST API to pull request-level diagnostics independently —
+`/api/agents/9232`, `/api/services/9232`, `api.aigora.org/agents/9232`,
+`api.aigora.org/services/9232`, `/_next/data/agents/9232.json` — all of
+these resolve to the SPA's HTML shell rather than a distinct API response,
+so I couldn't capture a failing request/response from outside a browser.
+Can provide DevTools Network/Console output on request if that helps
+triage.
 
 ### Transaction / agent ID
 Tx: `0x38f2c222148190910ec9183d6d4b2ff111be2fc3f9aa620cc7f5c6ca53997efb`
 Agent ID: `9232`
 
 ### Anything else
-Happy to share the wallet address / re-check anytime — this agent is live
-and this state is reproducible as of writing.
+Happy to re-check anytime — this agent is live and this state was still
+reproducing as of `2026-07-22T22:18:43Z`.
